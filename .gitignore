@@ -1,0 +1,37 @@
+# [Python 관련]
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# [환경 변수 및 보안 - 가장 중요!]
+.env
+*.key
+certs/
+
+# [데이터베이스 및 로컬 저장소]
+*.db
+*.sqlite3
+data/
+index_storage/    # LlamaIndex나 RAG용 로컬 인덱스 저장소
+vector_store/     # 벡터 데이터베이스 로컬 파일
+
+# [디자인/지식 베이스 데이터]
+# 만약 원본 데이터 용량이 너무 크다면 제외한다.
+design_wisdom/*.pdf
+design_wisdom/*.docx
+health_wisdom/*.csv
+
+# [IDE 및 OS 설정]
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# [로그 및 임시 파일]
+*.log
+logs/
+temp/
+tmp/
