@@ -46,21 +46,37 @@ AI 에이전트가 스스로 판단하고 행동합니다.
 ## 📁 Project Structure
 
 ```bash
-Y-Insight-Engine/
-├── app/
-│   ├── main.py          # 🚦 API Gateway (Routing for Packy, Mood-DNA, Cof/fee)
-│   ├── core/            # 🧠 Intelligence Engine
-│   │   ├── graph.py     # Unified Knowledge Graph Logic
-│   │   ├── search.py    # Tavily Search Agent
-│   │   └── planner.py   # Agentic Task Planning
-│   ├── services/        # 🔌 Domain Specific Logic
-│   │   ├── travel.py    # [Packy] Logic
-│   │   ├── design.py    # [Mood-DNA] Logic
-│   │   └── coffee.py    # [Cof/fee] Logic
-│   └── shared/          # ⚙️ Common Utilities (Auth, MCP Connectors)
-└── data/
-    ├── travel_wisdom/   # Travel/Customs Knowledge Base
-    └── design_wisdom/   # Design Principles Knowledge Base
+Universal-Insight-Engine/
+└── Yongyong-Agentic-Core/
+    ├── app/
+    │   ├── core/                  # 🧠 공통 지능 엔진 (Agentic Core)
+    │   │   ├── __init__.py
+    │   │   ├── graph.py           # 통합 지식 그래프 (Neo4j)
+    │   │   ├── provider.py        # LLM 모델 연결 (Gemini, Groq 등)
+    │   │   └── search.py          # Tavily 외부 지식 탐색 에이전트
+    │   │
+    │   ├── services/              # 🔌 도메인별 특화 서비스
+    │   │   ├── coffee/            # ☕ [Cof/fee] 
+    │   │   │   ├── __init__.py
+    │   │   │   ├── advisor.py     # 카페인 기반 컨디션 조언 로직
+    │   │   │   └── tracker.py     # 신체 반응 추적 및 분석
+    │   │   │
+    │   │   ├── design/            # 🌙 [Mood-DNA] 
+    │   │   │   ├── __init__.py
+    │   │   │   ├── design_analyzer.py   # 시각적 지표(OpenCV/OCR) 분석
+    │   │   │   └── design_consultant.py # 하이브리드 RAG 디자인 비평
+    │   │   │
+    │   │   └── travel/            # 🧳 [Packy] (5월 패키 확장용)
+    │   │
+    │   ├── database.py            # ⚙️ 공통 DB 모델
+    │   └── main.py                # 🚦 통합 API 게이트웨이 (FastAPI)
+    │
+    ├── design_wisdom/             # 📚 디자인 지식 텍스트 저장소
+    ├── health_wisdom/             # 🍎 건강/카페인 지식 텍스트 저장소
+    ├── .env                       # 🔑 API Key 모음
+    ├── .gitignore                 
+    ├── README.md                  # 📄 통합 프로젝트 설명서
+    └── requirements.txt           # 📦 파이썬 패키지 의존성 목록
 ```
 
 ## ✨ Vision

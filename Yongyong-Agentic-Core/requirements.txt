@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+opencv-python
+numpy
+easyocr
+rembg
+python-dotenv
+google-generativeai
+tavily-python
+llama-index
