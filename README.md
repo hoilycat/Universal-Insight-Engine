@@ -20,7 +20,7 @@
 *   **Synergy:** "피로도가 높은 날(Health) 작업한 디자인의 특징(Design)"을 분석하는 등 도메인 간 교차 추론 수행.
 
 ### 🤖 2. Agentic Reasoning Pipeline
-AI 에이전트가 스스로 판단하고 행동합니다.
+AI 에이전트가 사용자 요청의 의도를 파악하고 스스로 행동을 계획(Self-Planning)합니다.
 *   **Self-Planning:** 요청에 따라 어떤 도메인 지식을 꺼내올지 스스로 결정.
 *   **Tavily Search Agent:** 내부 지식이 부족할 경우, 실시간 외부 웹 데이터를 검색하여 근거 보강.
 *   **LLM Relay:** Gemini 1.5 Pro를 컨트롤러로 하여 상황에 최적인 모델(Groq, Ollama)을 배분.
@@ -31,6 +31,23 @@ AI 에이전트가 스스로 판단하고 행동합니다.
 *   `services/coffee`: 신체 반응 추론 특화 모듈
 *   `services/travel`: (Coming Soon) 여행 경험 최적화 모듈
 
+### 📚 4. Academic Grounding (학술적 근거 기반 추론)
+단순한 생성형 AI의 한계를 넘어, **전문 학술 데이터**를 바탕으로 근거 있는 답변을 제공합니다.
+- **`design_wisdom/`**: 디자인 심리학, 색채학, 타이포그래피 논문 데이터를 기반으로 한 객관적 디자인 비평.
+- **`health_wisdom/`**: 생리학, 식품영양학 논문을 참조하여 카페인 대사 및 신체 영향을 과학적으로 분석.
+
+---
+```mermaid
+graph TD
+    A[사용자 요청] --> B{Agentic Controller<br/>Gemini 1.5 Pro}
+    B -->|Self-Planning| C[Domain Selector]
+    C --> D[🌙 Design Module]
+    C --> E[☕ Coffee Module]
+    C --> F[🌐 Tavily Search]
+    D & E & F --> G[(Neo4j<br/>Unified Knowledge Graph)]
+    G --> H[논문 출처 매핑 및 인사이트 생성]
+    H --> I[✨ 검증된 초개인화 답변]
+```
 ---
 
 ## 🛠️ Tech Stack
@@ -61,12 +78,12 @@ Universal-Insight-Engine/
     │   │   │   ├── advisor.py     # 카페인 기반 컨디션 조언 로직
     │   │   │   └── tracker.py     # 신체 반응 추적 및 분석
     │   │   │
-    │   │   ├── design/            # 🌙 [Mood-DNA] 
+    │   │   ├── design/            # 🌙 [Mood-DNA] 학술 기반 디자인 비평 엔진
     │   │   │   ├── __init__.py
     │   │   │   ├── design_analyzer.py   # 시각적 지표(OpenCV/OCR) 분석
     │   │   │   └── design_consultant.py # 하이브리드 RAG 디자인 비평
     │   │   │
-    │   │   └── travel/            # 🧳 [Packy] (5월 패키 확장용)
+    │   │   └── travel/            # 🧳 [Packy] (5월 확장 예정)
     │   │
     │   ├── database.py            # ⚙️ 공통 DB 모델
     │   └── main.py                # 🚦 통합 API 게이트웨이 (FastAPI)
