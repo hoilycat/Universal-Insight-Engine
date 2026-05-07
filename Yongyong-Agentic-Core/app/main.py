@@ -43,23 +43,43 @@ async def test_search(q: str):
 
 
 #추가 API 엔드포인트
+# app/main.py 수정본
 @app.post("/design/analyze")
 async def analyze_design(
-    data: DesignInput,
-    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...), # 실제 이미지 파일 받기
+    brand_context: str = Form(...), # JSON 형태의 브랜드 설명
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: Session = Depends(get_db)
 ):
-    # 1. SQLite에 저장
-    record = DesignHistory(**data.dict())
+    # 1. 이미지 읽기 및 OpenCV 분석
+    image_bytes = await file.read()
+    brightness = calculate_brightness(image_bytes)
+    complexity = calculate_complexity(image_bytes)
+    # TODO: 필요한 다른 지표들(OCR 등)도 여기서 호출 가능
+
+    # 2. AI 컨설턴트 호출 (에이전틱 비평 생성)
+    # 현재 코드의 design_consultant.py에 있는 consult_design 호출
+    # (매개변수가 많으니 필요한 것 위주로 전달하게 수정 필요)
+    
+    # 3. SQLite 저장 (기록용)
+    record = DesignHistory(
+        brightness=brightness,
+        complexity=complexity,
+        description=brand_context # 비평 결과 JSON을 담는 것이 좋음
+    )
     db.add(record)
-
-    # 2. 이벤트 리스너 등록 (커밋 전에!)
+    
+    # 4. Neo4j 자동 주입 (클로드가 짜준 자동화 로직!)
     register_auto_ingest(db, background_tasks)
-
-    # 3. 커밋 → 리스너 발동 → 백그라운드 ingestion 자동 실행
+    
     db.commit()
+    db.refresh(record)
 
-    return {"status": "ok", "message": "분석 저장 완료, Neo4j ingestion 진행 중"}
+    return {
+        "id": record.id, 
+        "metrics": {"brightness": brightness, "complexity": complexity},
+        "status": "Neo4j Syncing..."
+    }
 
 
 @app.post("/mooddna/ask")   # 디자인 챗봇
@@ -74,3 +94,4 @@ async def ask_coffee_endpoint(req: QuestionRequest):
 @app.post("/insight/ask")   
 async def ask_insight_endpoint(req: QuestionRequest):
     return {"answer": ask_yie(req.question)}
+

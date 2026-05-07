@@ -27,3 +27,11 @@ class UnifiedBrain:
     def get_eye(self):
         """이미지 이해용"""
         return self.gemini_flash # 혹은 로컬 Moondream 연결
+    
+  # 필요에 따라 모델을 직접 호출하는 헬퍼 메서드도 제공
+    def call_analyst(self, prompt: str) -> str:
+        completion = self.groq_client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model=self.llama_analyst,
+        )
+        return completion.choices[0].message.content

@@ -11,6 +11,7 @@ def get_hybrid_index():
         username=os.getenv("NEO4J_USERNAME"),
         password=os.getenv("NEO4J_PASSWORD"),
         url=os.getenv("NEO4J_URI"),
+        database=os.getenv("NEO4J_DATABASE", "neo4j"),
     )
 
     # 2. 벡터 창고 연결 (Local ChromaDB)
