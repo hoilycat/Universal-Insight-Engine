@@ -13,3 +13,16 @@ class CoffeeInput(BaseModel):
     caffeine_mg: int
     drink_type: str
     body_reaction: str
+
+class KnowledgeChunk(BaseModel):
+    id: str
+    document: str
+    text: str
+    insight_en: Optional[str]
+    insight_ko: Optional[str]
+    tags: list[str]
+    score: int
+
+class KnowledgeSearchResponse(BaseModel):
+    query: str
+    results: list[KnowledgeChunk]

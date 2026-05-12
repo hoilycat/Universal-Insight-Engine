@@ -5,12 +5,20 @@ from app.database import get_db, DesignHistory, CoffeeLog
 from app.core.search import search_agent
 from app.core.auto_ingest import register_auto_ingest
 from app.services.design.design_analyzer import calculate_brightness, calculate_complexity
+# app/main.py
+from fastapi import FastAPI, Depends, BackgroundTasks, File, UploadFile, Form
+from sqlalchemy.orm import Session
+from app.database import get_db, DesignHistory, CoffeeLog
+from app.core.search import search_agent
+from app.core.auto_ingest import register_auto_ingest
+from app.services.design.design_analyzer import calculate_brightness, calculate_complexity
 # 함수들
 from app.core.query_engine import query_cross_domain_brightness_by_mood
 from app.core.mooddna import ask_mooddna
 from app.core.coffee_insight import ask_coffee
 from app.core.yie import ask_yie
-from app.schemas import DesignInput, QuestionRequest
+from app.core.neo4j_kb import search_knowledge_base
+from app.schemas import DesignInput, QuestionRequest, KnowledgeSearchResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 import json
@@ -95,3 +103,9 @@ async def ask_coffee_endpoint(req: QuestionRequest):
 async def ask_insight_endpoint(req: QuestionRequest):
     return {"answer": ask_yie(req.question)}
 
+@app.get("/knowledge/search", response_model=KnowledgeSearchResponse)
+async def search_knowledge_endpoint(q: str, limit: int = 8):
+    return {
+        "query": q,
+        "results": search_knowledge_base(q, limit=min(max(limit, 1), 20)),
+    }
