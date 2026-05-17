@@ -2,8 +2,18 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks
 from app.database import DesignHistory, CoffeeLog
-from app.core.ingestion import ingest_design_from_dict
-from app.core.ingestion_coffee import ingest_coffee_from_dict
+
+
+def ingest_design_background(data: dict):
+    from app.core.ingestion import ingest_design_from_dict
+
+    ingest_design_from_dict(data)
+
+
+def ingest_coffee_background(data: dict):
+    from app.core.ingestion_coffee import ingest_coffee_from_dict
+
+    ingest_coffee_from_dict(data)
 
 # -----------------------------------------------
 # SQLAlchemy Event Listener
@@ -28,7 +38,7 @@ def register_auto_ingest(session: Session, background_tasks: BackgroundTasks):
                     "complexity": obj.complexity,
                     "created_at": str(obj.created_at),
                 }
-                background_tasks.add_task(ingest_design_from_dict, data)
+                background_tasks.add_task(ingest_design_background, data)
 
             elif isinstance(obj, CoffeeLog):
                 data = {
@@ -38,4 +48,4 @@ def register_auto_ingest(session: Session, background_tasks: BackgroundTasks):
                     "body_reaction": obj.body_reaction,
                     "created_at": str(obj.created_at),
                 }
-                background_tasks.add_task(ingest_coffee_from_dict, data)
+                background_tasks.add_task(ingest_coffee_background, data)
