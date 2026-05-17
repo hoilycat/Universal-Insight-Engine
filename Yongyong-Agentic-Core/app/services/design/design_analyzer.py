@@ -1,12 +1,17 @@
 import cv2
 import numpy as np
-from rembg import remove
-import easyocr
 
 
-# 1. OCR 리더기 초기화 (영어와 한국어 지원)
-# gpu=True로 설정하면 그래픽카드를 써서 훨씬 빨라짐
-reader = easyocr.Reader(['ko', 'en'], gpu=False, verbose=False) 
+_reader = None
+
+
+def get_ocr_reader():
+    global _reader
+    if _reader is None:
+        import easyocr
+
+        _reader = easyocr.Reader(['ko', 'en'], gpu=False, verbose=False)
+    return _reader
 
 def analyze_text_with_ocr(image_bytes):
     """이미지 내 텍스트 내용, 위치, 폰트 스타일 추정"""
@@ -16,7 +21,7 @@ def analyze_text_with_ocr(image_bytes):
     
     # 2. OCR 실행
     # 결과값 형식: [[(좌표), "텍스트", 확률], ...]
-    results = reader.readtext(img)
+    results = get_ocr_reader().readtext(img)
     
     if not results:
         return {"has_text": False, "text_content": "", "text_area_ratio": 0.0, "raw_results": []}

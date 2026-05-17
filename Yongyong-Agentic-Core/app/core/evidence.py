@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # app/core/evidence.py
 """
 Domain-filtered wide search (30개) + intent-aware query expansion.

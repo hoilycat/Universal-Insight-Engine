@@ -1,31 +1,34 @@
-
-
 import os
-from llama_index.core import Settings, StorageContext , StorageContext
-from llama_index.llms.gemini import Gemini
-from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
-from llama_index.core.query_engine import KnowledgeGraphQueryEngine
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# 셋업
-Settings.llm = Gemini(model="gemini-2.0-flash", api_key=os.getenv("GEMINI_API_KEY"))
-graph_store = Neo4jPropertyGraphStore(
-    username=os.getenv("NEO4J_USERNAME", "neo4j"),
-    password=os.getenv("NEO4J_PASSWORD"),
-    url=os.getenv("NEO4J_URI"),
-    database=os.getenv("NEO4J_DATABASE"), 
-)
+query_engine = None
 
 
-# 3. ★ 핵심: 창고를 상자(StorageContext)에 담기 ★
-storage_context = StorageContext.from_defaults(graph_store=graph_store)
+def get_query_engine():
+    global query_engine
+    if query_engine is not None:
+        return query_engine
 
-query_engine = KnowledgeGraphQueryEngine(
-    storage_context=storage_context,  # 👈 graph_store 대신 storage_context를 입력!
-    llm=Settings.llm
-)
+    from llama_index.core import Settings, StorageContext
+    from llama_index.llms.gemini import Gemini
+    from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
+    from llama_index.core.query_engine import KnowledgeGraphQueryEngine
+
+    Settings.llm = Gemini(model="gemini-2.0-flash", api_key=os.getenv("GEMINI_API_KEY"))
+    graph_store = Neo4jPropertyGraphStore(
+        username=os.getenv("NEO4J_USERNAME", "neo4j"),
+        password=os.getenv("NEO4J_PASSWORD"),
+        url=os.getenv("NEO4J_URI"),
+        database=os.getenv("NEO4J_DATABASE"),
+    )
+    storage_context = StorageContext.from_defaults(graph_store=graph_store)
+    query_engine = KnowledgeGraphQueryEngine(
+        storage_context=storage_context,
+        llm=Settings.llm,
+    )
+    return query_engine
 # 스키마 힌트들은 코드 가독성을 위해 생략(상단에 정의되어 있다고 가정)
 # ... ( MOODDNA_SCHEMA, COFFEE_SCHEMA 사용) ...
 
@@ -55,12 +58,12 @@ Neo4j 그래프 스키마 (Cof/fee 전용):
 
 def ask_mooddna(question: str):
     augmented = f"{MOODDNA_SCHEMA}\n질문: {question}"
-    return str(query_engine.query(augmented))
+    return str(get_query_engine().query(augmented))
 
 def ask_coffee(question: str):
     augmented = f"{COFFEE_SCHEMA}\n질문: {question}"
-    return str(query_engine.query(augmented))
+    return str(get_query_engine().query(augmented))
 
 def ask_yie(question: str):
     augmented = f"[Rule: 모든 데이터 통합 분석]\n질문: {question}"
-    return str(query_engine.query(augmented))
+    return str(get_query_engine().query(augmented))

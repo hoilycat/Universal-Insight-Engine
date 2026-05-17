@@ -1,19 +1,29 @@
 import os
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
 from llama_index.core.graph_stores.types import EntityNode, Relation
 
-load_dotenv()
+CORE_DIR = Path(__file__).resolve().parents[2]
+ROOT_DIR = CORE_DIR.parent
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(CORE_DIR / ".env", override=True)
 
-# 클라우드 Neo4j 연결
-graph_store = Neo4jPropertyGraphStore(
-    username=os.getenv("NEO4J_USERNAME", "neo4j"),
-    password=os.getenv("NEO4J_PASSWORD"),
-    url=os.getenv("NEO4J_URI"),
-    database=os.getenv("NEO4J_DATABASE"),
-)
+graph_store = None
+
+
+def get_graph_store():
+    global graph_store
+    if graph_store is None:
+        graph_store = Neo4jPropertyGraphStore(
+            username=os.getenv("NEO4J_USERNAME", "neo4j"),
+            password=os.getenv("NEO4J_PASSWORD"),
+            url=os.getenv("NEO4J_URI"),
+            database=os.getenv("NEO4J_DATABASE"),
+        )
+    return graph_store
 
 MOOD_KEYWORDS = ["피로", "집중", "창의", "스트레스", "활기", "신뢰", "미니멀"]
 
@@ -66,6 +76,7 @@ def ingest_design_from_dict(data: dict):
     )
     
     # 4. Neo4j 저장
-    graph_store.upsert_nodes([design_node, mood_node])
-    graph_store.upsert_relations([relation])
-    print(f"✅ [Design Sync] design_{data['id']} → {mood_keyword} (VIP 라운지 입장)")   
+    store = get_graph_store()
+    store.upsert_nodes([design_node, mood_node])
+    store.upsert_relations([relation])
+    print(f"✅ [Design Sync] design_{data['id']} → {mood_keyword} (VIP 라운지 입장)")

@@ -5,16 +5,20 @@ from pathlib import Path
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
 
-ROOT_DIR = Path(r"C:\Users\iopuh\Universal-Insight-Engine")
-load_dotenv(ROOT_DIR / ".env")
+DEFAULT_WINDOWS_ROOT = Path(r"C:\Users\iopuh\Universal-Insight-Engine")
+ROOT_DIR = Path(os.getenv("UIE_ROOT_DIR") or DEFAULT_WINDOWS_ROOT)
+if not ROOT_DIR.exists():
+    ROOT_DIR = Path(__file__).resolve().parents[2]
+CORE_DIR = ROOT_DIR / "Yongyong-Agentic-Core"
+load_dotenv(CORE_DIR / ".env")
 
 URI = os.getenv("NEO4J_URI", "neo4j://127.0.0.1:7687").strip()
 USERNAME = os.getenv("NEO4J_USERNAME", "neo4j").strip()
 PASSWORD = os.getenv("NEO4J_PASSWORD", "yongyong1234").strip()
 DATABASE = os.getenv("NEO4J_DATABASE", "neo4j").strip()
 
-DESIGN_FILE = ROOT_DIR / "Yongyong-Agentic-Core" / "data" / "chunks" / "design_chunks.jsonl"
-HEALTH_FILE = ROOT_DIR / "Yongyong-Agentic-Core" / "data" / "chunks" / "health_chunks.jsonl"
+DESIGN_FILE = CORE_DIR / "data" / "chunks" / "design_chunks.jsonl"
+HEALTH_FILE = CORE_DIR / "data" / "chunks" / "health_chunks.jsonl"
 
 def get_chunks():
     chunks = []
