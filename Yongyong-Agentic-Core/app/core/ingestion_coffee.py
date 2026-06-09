@@ -4,12 +4,19 @@ from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
 from llama_index.core.graph_stores.types import EntityNode, Relation
 from .ingestion import get_shared_mood_node, extract_mood
 
-graph_store = Neo4jPropertyGraphStore(
-    username=os.getenv("NEO4J_USERNAME", "neo4j"),
-    password=os.getenv("NEO4J_PASSWORD"),
-    url=os.getenv("NEO4J_URI"),
-    database=os.getenv("NEO4J_DATABASE"), 
-)
+graph_store = None
+
+
+def get_graph_store():
+    global graph_store
+    if graph_store is None:
+        graph_store = Neo4jPropertyGraphStore(
+            username=os.getenv("NEO4J_USERNAME", "neo4j"),
+            password=os.getenv("NEO4J_PASSWORD"),
+            url=os.getenv("NEO4J_URI"),
+            database=os.getenv("NEO4J_DATABASE"),
+        )
+    return graph_store
 
 def ingest_coffee_from_dict(data: dict):
     """
@@ -41,6 +48,7 @@ def ingest_coffee_from_dict(data: dict):
         label="CAUSED_REACTION"
     )
 
-    graph_store.upsert_nodes([coffee_node, mood_node])
-    graph_store.upsert_relations([relation])
+    store = get_graph_store()
+    store.upsert_nodes([coffee_node, mood_node])
+    store.upsert_relations([relation])
     print(f"✅ [Coffee] Neo4j 저장 완료: coffee_{data['id']} → {mood_keyword}")

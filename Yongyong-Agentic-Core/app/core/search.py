@@ -1,10 +1,14 @@
 # app/core/search.py
 import os
+from pathlib import Path
 from tavily import TavilyClient
 from dotenv import load_dotenv
 
 # .env 파일에서 API 키 로드
-load_dotenv()
+CORE_DIR = Path(__file__).resolve().parents[2]
+ROOT_DIR = CORE_DIR.parent
+load_dotenv(ROOT_DIR / ".env")
+load_dotenv(CORE_DIR / ".env", override=True)
 
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
