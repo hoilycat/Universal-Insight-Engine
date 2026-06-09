@@ -35,3 +35,10 @@ Thumbs.db
 logs/
 temp/
 tmp/
+
+
+#기타 파일
+*.bak
+*.tmp
+*.swp
+code_gather.py
